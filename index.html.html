@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EV-COMM AI | Electric Mobility Communication Hub</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            900: '#14532d',
+                        },
+                        darkbg: '#0b0f17',
+                        darkcard: '#111827',
+                        darkborder: '#1f2937'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f17;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f2937;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #374151;
+        }
+        .glow-effect {
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.25);
+        }
+        .glow-border {
+            border-color: rgba(34, 197, 94, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-darkbg text-slate-100 font-sans antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- TOP HEADER -->
+    <header class="bg-darkcard border-b border-darkborder sticky top-0 z-40 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <!-- Brand Logo & Title -->
+            <div class="flex items-center space-x-3">
+                <div class="bg-brand-500/20 text-brand-400 p-2.5 rounded-xl border border-brand-500/30 glow-effect">
+                    <i class="fa-solid fa-charging-station text-xl"></i>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="font-bold text-lg tracking-wide text-white">EV-COMM <span class="text-brand-400">AI</span></span>
+                        <span class="bg-brand-500/10 text-brand-400 text-xs px-2 py-0.5 rounded-full border border-brand-500/20 font-medium">Group 10 - Group B</span>
+                    </div>
+                    <p class="text-xs text-slate-400 hidden sm:block">Next-Gen Electric Mobility Communication Hub</p>
+                </div>
+            </div>
+
+            <!-- Controls & Quick Stats -->
+            <div class="flex items-center space-x-3">
+                <button onclick="openModal('archModal')" class="hidden lg:flex items-center space-x-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-3 py-2 rounded-lg border border-slate-700 transition">
+                    <i class="fa-solid fa-cubes text-brand-400"></i>
+                    <span>AI Stack Architecture</span>
+                </button>
+
+                <!-- Notifications Button -->
+                <button onclick="triggerToast('Broadcasting urgent regulatory alert to 450 fleet hubs...')" class="relative p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition" title="Simulate Alert">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-brand-500"></span>
+                    </span>
+                </button>
+
+                <!-- Team Profile Trigger -->
+                <button onclick="openModal('teamModal')" class="flex items-center space-x-2 bg-brand-500/10 hover:bg-brand-500/20 text-brand-400 text-xs font-semibold px-3 py-2 rounded-lg border border-brand-500/30 transition">
+                    <i class="fa-solid fa-users"></i>
+                    <span class="hidden md:inline">Group 10 Team</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN BODY LAYOUT -->
+    <div class="max-w-7xl mx-auto w-full flex-1 flex flex-col md:flex-row gap-6 p-4 md:p-6">
+
+        <!-- LEFT SIDEBAR NAVIGATION -->
+        <aside class="w-full md:w-64 flex-shrink-0 space-y-2">
+            <div class="bg-darkcard border border-darkborder rounded-xl p-3">
+                <div class="text-xs font-bold uppercase tracking-wider text-slate-400 px-3 py-2">Modules</div>
+                <nav class="space-y-1">
+                    <button onclick="switchTab('overview')" id="nav-overview" class="tab-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition bg-brand-500/20 text-brand-400 border border-brand-500/30">
+                        <i class="fa-solid fa-chart-line w-5 text-center"></i>
+                        <span>Executive Overview</span>
+                    </button>
+                    <button onclick="switchTab('policy')" id="nav-policy" class="tab-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                        <i class="fa-solid fa-robot w-5 text-center"></i>
+                        <span>Policy AI Assistant</span>
+                    </button>
+                    <button onclick="switchTab('fleet')" id="nav-fleet" class="tab-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                        <i class="fa-solid fa-truck-fast w-5 text-center"></i>
+                        <span>Fleet Telematics Hub</span>
+                    </button>
+                    <button onclick="switchTab('copilot')" id="nav-copilot" class="tab-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                        <i class="fa-solid fa-handshake w-5 text-center"></i>
+                        <span>Dealer B2B Copilot</span>
+                    </button>
+                    <button onclick="switchTab('analytics')" id="nav-analytics" class="tab-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                        <i class="fa-solid fa-pie-chart w-5 text-center"></i>
+                        <span>Analytics &amp; Insights</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Industry Snapshot Card -->
+            <div class="bg-darkcard border border-darkborder rounded-xl p-4 space-y-3">
+                <div class="flex items-center justify-between text-xs font-semibold text-slate-400">
+                    <span>IBEF EV Market Index</span>
+                    <span class="text-brand-400 flex items-center"><i class="fa-solid fa-arrow-up text-xs mr-1"></i>49.2% CAGR</span>
+                </div>
+                <div class="text-2xl font-bold text-white">₹1.25 Lakh Cr</div>
+                <p class="text-xs text-slate-400">Projected Indian EV industry value by 2030 across 2W, 3W, 4W &amp; Infra.</p>
+            </div>
+        </aside>
+
+        <!-- CONTENT PANEL AREA -->
+        <main class="flex-1 space-y-6">
+
+            <!-- TAB 1: EXECUTIVE OVERVIEW -->
+            <section id="tab-overview" class="tab-content space-y-6">
+                <!-- Top Stat Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-darkcard border border-darkborder p-4 rounded-xl">
+                        <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
+                            <span>Annual EV Sales (2026)</span>
+                            <i class="fa-solid fa-car-side text-brand-400"></i>
+                        </div>
+                        <div class="text-2xl font-bold text-white">1.82M Units</div>
+                        <p class="text-xs text-brand-400 mt-1"><i class="fa-solid fa-arrow-trend-up mr-1"></i>+34% YoY Growth</p>
+                    </div>
+
+                    <div class="bg-darkcard border border-darkborder p-4 rounded-xl">
+                        <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
+                            <span>Active Charging Hubs</span>
+                            <i class="fa-solid fa-plug text-cyan-400"></i>
+                        </div>
+                        <div class="text-2xl font-bold text-white">12,450</div>
+                        <p class="text-xs text-slate-400 mt-1">Nationwide grid coverage</p>
+                    </div>
+
+                    <div class="bg-darkcard border border-darkborder p-4 rounded-xl">
+                        <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
+                            <span>Policy Synthesis Lag</span>
+                            <i class="fa-solid fa-clock-rotate-left text-amber-400"></i>
+                        </div>
+                        <div class="text-2xl font-bold text-white">2.4 Hours</div>
+                        <p class="text-xs text-brand-400 mt-1"><i class="fa-solid fa-bolt mr-1"></i>90% faster with AI</p>
+                    </div>
+
+                    <div class="bg-darkcard border border-darkborder p-4 rounded-xl">
+                        <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
+                            <span>Dealer Query Resolution</span>
+                            <i class="fa-solid fa-check-circle text-emerald-400"></i>
+                        </div>
+                        <div class="text-2xl font-bold text-white">96.8%</div>
+                        <p class="text-xs text-slate-400 mt-1">First-pass automated accuracy</p>
+                    </div>
+                </div>
+
+                <!-- Live Policy & News Feed -->
+                <div class="bg-darkcard border border-darkborder rounded-xl p-5 space-y-4">
+                    <div class="flex items-center justify-between border-b border-darkborder pb-3">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-newspaper text-brand-400"></i>
+                            <h2 class="font-bold text-white">IBEF Real-Time Industry &amp; Regulatory Feed</h2>
+                        </div>
+                        <span class="text-xs text-slate-400 flex items-center"><span class="w-2 h-2 rounded-full bg-brand-500 mr-2 animate-pulse"></span>Live Stream</span>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="p-3 bg-slate-900/60 rounded-lg border border-slate-800 hover:border-slate-700 transition">
+                            <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+                                <span class="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 font-medium">FAME III Update</span>
+                                <span>20 mins ago</span>
+                            </div>
+                            <h3 class="text-sm font-semibold text-slate-200">Ministry of Heavy Industries releases draft guidelines for commercial e-bus subsidies.</h3>
+                            <p class="text-xs text-slate-400 mt-1">AI Summary: Subsidy cap increased by 15% for urban transit fleets adopting local battery packing.</p>
+                        </div>
+
+                        <div class="p-3 bg-slate-900/60 rounded-lg border border-slate-800 hover:border-slate-700 transition">
+                            <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+                                <span class="bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded border border-cyan-500/20 font-medium">Battery Swapping</span>
+                                <span>2 hours ago</span>
+                            </div>
+                            <h3 class="text-sm font-semibold text-slate-200">Interoperability standards standardized across Tier-1 metro regions.</h3>
+                            <p class="text-xs text-slate-400 mt-1">AI Summary: Mandates standardized connector specs for 2W/3W commercial swapping kiosks.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: POLICY AI ASSISTANT -->
+            <section id="tab-policy" class="tab-content hidden space-y-6">
+                <div class="bg-darkcard border border-darkborder rounded-xl p-5 space-y-4 flex flex-col h-[600px]">
+                    <div class="flex items-center justify-between border-b border-darkborder pb-3">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center border border-brand-500/30">
+                                <i class="fa-solid fa-robot"></i>
+                            </div>
+                            <div>
+                                <h2 class="font-bold text-white text-sm">IBEF EV Policy &amp; Compliance Assistant</h2>
+                                <p class="text-xs text-slate-400">Query regulatory docs, FAME III guidelines, &amp; GST mandates</p>
+                            </div>
+                        </div>
+                        <button onclick="clearChat()" class="text-xs text-slate-400 hover:text-white"><i class="fa-solid fa-rotate-right mr-1"></i>Clear Chat</button>
+                    </div>
+
+                    <!-- Chat Log Window -->
+                    <div id="chatLog" class="flex-1 overflow-y-auto space-y-3 p-3 bg-slate-900/60 rounded-lg border border-slate-800 text-xs">
+                        <!-- AI Greeting -->
+                        <div class="flex space-x-3">
+                            <div class="w-7 h-7 rounded bg-brand-500/20 text-brand-400 flex items-center justify-center flex-shrink-0 border border-brand-500/30">AI</div>
+                            <div class="bg-slate-800 text-slate-200 p-3 rounded-lg max-w-[85%] border border-slate-700">
+                                Hello! I am the EV Industry Compliance Copilot trained on IBEF reports and Ministry notifications. How can I assist your executive team today?
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Prompt Buttons -->
+                    <div class="space-y-2">
+                        <div class="text-xs text-slate-400 font-semibold">Quick Prompts:</div>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="sendQuickPrompt('Summarize PLI scheme incentives for EV battery manufacturing.')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-lg border border-slate-700 transition">
+                                PLI Battery Incentives
+                            </button>
+                            <button onclick="sendQuickPrompt('What are the GST rates on EV vehicles and charging services?')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-lg border border-slate-700 transition">
+                                GST Rates Breakdown
+                            </button>
+                            <button onclick="sendQuickPrompt('Draft executive update on FAME III subsidy allocations.')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-lg border border-slate-700 transition">
+                                Draft FAME III Update
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Chat Input Bar -->
+                    <form onsubmit="handleChatSubmit(event)" class="flex space-x-2">
+                        <input id="chatInput" type="text" placeholder="Type your EV policy query or command..." class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
+                        <button type="submit" class="bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs transition flex items-center space-x-1">
+                            <span>Send</span>
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- TAB 3: FLEET TELEMATICS HUB -->
+            <section id="tab-fleet" class="tab-content hidden space-y-6">
+                <div class="bg-darkcard border border-darkborder rounded-xl p-5 space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-darkborder pb-3">
+                        <div>
+                            <h2 class="font-bold text-white text-sm">Commercial EV Fleet &amp; Charging Network Telematics</h2>
+                            <p class="text-xs text-slate-400">Real-time status monitoring &amp; automated driver alerts</p>
+                        </div>
+                        
+                        <!-- Status Filter -->
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-slate-400">Filter:</span>
+                            <button onclick="filterFleet('all')" class="text-xs bg-brand-500/20 text-brand-400 px-2.5 py-1 rounded border border-brand-500/30 font-medium">All (4)</button>
+                            <button onclick="filterFleet('warning')" class="text-xs bg-slate-800 text-slate-400 hover:text-white px-2.5 py-1 rounded border border-slate-700">Alerts (1)</button>
+                        </div>
+                    </div>
+
+                    <!-- Fleet Nodes Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="fleetGrid">
+                        <!-- Node 1 -->
+                        <div class="fleet-card all active p-4 bg-slate-900/60 rounded-xl border border-slate-800 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                                    <span class="font-bold text-xs text-white">Hub #104 - Delhi North Grid</span>
+                                </div>
+                                <span class="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Operational</span>
+                            </div>
+                            <div class="text-xs text-slate-400 grid grid-cols-2 gap-2 mt-2">
+                                <div>Active Chargers: <span class="text-white font-semibold">18/20</span></div>
+                                <div>Avg Battery Temp: <span class="text-white font-semibold">31°C</span></div>
+                            </div>
+                            <button onclick="triggerToast('Broadcast sent to Delhi North fleet drivers.')" class="w-full mt-2 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 py-1.5 rounded border border-slate-700">
+                                Send Advisory Alert
+                            </button>
+                        </div>
+
+                        <!-- Node 2 (Warning) -->
+                        <div class="fleet-card all warning p-4 bg-slate-900/60 rounded-xl border border-amber-500/40 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                    <span class="font-bold text-xs text-white">Fleet Unit #88 - Mumbai Logistics</span>
+                                </div>
+                                <span class="text-xs text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">BMS High Temp</span>
+                            </div>
+                            <div class="text-xs text-slate-400 grid grid-cols-2 gap-2 mt-2">
+                                <div>Charge Level: <span class="text-white font-semibold">14%</span></div>
+                                <div>Cell Temp: <span class="text-amber-400 font-semibold">44°C (High)</span></div>
+                            </div>
+                            <button onclick="triggerToast('Rerouting Unit #88 to nearest swapping station...')" class="w-full mt-2 text-xs bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 py-1.5 rounded border border-amber-500/30">
+                                Auto-Reroute to Swap Hub
+                            </button>
+                        </div>
+
+                        <!-- Node 3 -->
+                        <div class="fleet-card all active p-4 bg-slate-900/60 rounded-xl border border-slate-800 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                                    <span class="font-bold text-xs text-white">Hub #202 - Bengaluru Tech Park</span>
+                                </div>
+                                <span class="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Operational</span>
+                            </div>
+                            <div class="text-xs text-slate-400 grid grid-cols-2 gap-2 mt-2">
+                                <div>Active Chargers: <span class="text-white font-semibold">32/32</span></div>
+                                <div>Solar Offset: <span class="text-emerald-400 font-semibold">42%</span></div>
+                            </div>
+                            <button onclick="triggerToast('Solar grid optimization enabled.')" class="w-full mt-2 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 py-1.5 rounded border border-slate-700">
+                                Optimize Load Balancing
+                            </button>
+                        </div>
+
+                        <!-- Node 4 -->
+                        <div class="fleet-card all active p-4 bg-slate-900/60 rounded-xl border border-slate-800 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                                    <span class="font-bold text-xs text-white">Fleet Unit #12 - Pune Express</span>
+                                </div>
+                                <span class="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">En Route</span>
+                            </div>
+                            <div class="text-xs text-slate-400 grid grid-cols-2 gap-2 mt-2">
+                                <div>Speed: <span class="text-white font-semibold">62 km/h</span></div>
+                                <div>Est Range: <span class="text-white font-semibold">185 km</span></div>
+                            </div>
+                            <button onclick="triggerToast('Telematics log updated.')" class="w-full mt-2 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 py-1.5 rounded border border-slate-700">
+                                Ping Telematics Diagnostic
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: DEALER COPILOT -->
+            <section id="tab-copilot" class="tab-content hidden space-y-6">
+                <div class="bg-darkcard border border-darkborder rounded-xl p-5 space-y-4">
+                    <div class="border-b border-darkborder pb-3">
+                        <h2 class="font-bold text-white text-sm">Dealer &amp; B2B Partner Support Copilot</h2>
+                        <p class="text-xs text-slate-400">Automated lead qualification &amp; customer subsidy calculator</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Calculator Tool -->
+                        <div class="p-4 bg-slate-900/60 rounded-xl border border-slate-800 space-y-3">
+                            <h3 class="text-xs font-bold text-brand-400 uppercase tracking-wide">Customer TCO &amp; Subsidy Estimator</h3>
+                            <div class="space-y-2 text-xs">
+                                <div>
+                                    <label class="block text-slate-400 mb-1">Select Vehicle Segment</label>
+                                    <select id="calcSegment" class="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 text-white">
+                                        <option value="15000">Electric 2W (High Speed)</option>
+                                        <option value="30000">Electric 3W L5 Commercial</option>
+                                        <option value="120000">Passenger EV 4W</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-400 mb-1">State Subsidy Region</label>
+                                    <select class="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 text-white">
+                                        <option>Delhi NCR (Max Incentive)</option>
+                                        <option>Maharashtra</option>
+                                        <option>Karnataka</option>
+                                        <option>Gujarat</option>
+                                    </select>
+                                </div>
+                                <button onclick="calculateSubsidy()" class="w-full bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold py-2 rounded text-xs transition">
+                                    Generate TCO Savings Sheet
+                                </button>
+                            </div>
+                            <div id="calcResult" class="hidden p-3 bg-brand-500/10 rounded border border-brand-500/20 text-xs space-y-1">
+                                <div class="font-bold text-brand-400">Estimated Subsidy: <span id="subsidyAmt">₹15,000</span></div>
+                                <div class="text-slate-300">Annual Fuel Savings: ₹42,500 vs Petrol</div>
+                            </div>
+                        </div>
+
+                        <!-- Auto-Response Generator -->
+                        <div class="p-4 bg-slate-900/60 rounded-xl border border-slate-800 space-y-3">
+                            <h3 class="text-xs font-bold text-cyan-400 uppercase tracking-wide">Dealer FAQ Assistant</h3>
+                            <div class="space-y-2 text-xs">
+                                <p class="text-slate-400">Generate multi-lingual communication templates for common dealership client queries.</p>
+                                <button onclick="generateTemplate('warranty')" class="w-full text-left p-2 bg-slate-800 hover:bg-slate-700 rounded border border-slate-700 text-slate-200 transition">
+                                    <i class="fa-solid fa-shield-halved mr-2 text-cyan-400"></i>Battery 8-Year Warranty Terms Explainer
+                                </button>
+                                <button onclick="generateTemplate('charging')" class="w-full text-left p-2 bg-slate-800 hover:bg-slate-700 rounded border border-slate-700 text-slate-200 transition">
+                                    <i class="fa-solid fa-house-chimney-crack mr-2 text-brand-400"></i>Home Fast-Charger Installation Checklist
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 5: ANALYTICS & INSIGHTS -->
+            <section id="tab-analytics" class="tab-content hidden space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Chart 1: Sales Growth -->
+                    <div class="bg-darkcard border border-darkborder rounded-xl p-4 space-y-2">
+                        <h3 class="text-xs font-bold text-slate-300">EV Adoption Projections (2020-2030) - Units</h3>
+                        <div class="h-56">
+                            <canvas id="chartSales"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Chart 2: Sentiment -->
+                    <div class="bg-darkcard border border-darkborder rounded-xl p-4 space-y-2">
+                        <h3 class="text-xs font-bold text-slate-300">Consumer Perception &amp; Communication Efficiency Score</h3>
+                        <div class="h-56">
+                            <canvas id="chartSentiment"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- FOOTER CREDITS & TEAM INFO -->
+    <footer class="bg-darkcard border-t border-darkborder py-4 px-6 text-xs text-slate-400 mt-auto">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
+            <div class="flex items-center space-x-2">
+                <span class="font-bold text-slate-200">EV-COMM AI Hub</span>
+                <span>|</span>
+                <span>Phase II Functional Prototype</span>
+            </div>
+            
+            <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-slate-300">
+                <span class="font-semibold text-brand-400">Group 10:</span>
+                <span>Parth Nema</span>
+                <span>•</span>
+                <span>Anshu Lodhi</span>
+                <span>•</span>
+                <span>Siya Jaiswal</span>
+                <span>•</span>
+                <span>Janvi Kamra</span>
+                <span>•</span>
+                <span>Anzila Hayat</span>
+            </div>
+
+            <div>
+                <button onclick="downloadReport()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded border border-slate-700 text-xs transition">
+                    <i class="fa-solid fa-download mr-1 text-brand-400"></i>Export Summary PDF
+                </button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL 1: TEAM PROFILES -->
+    <div id="teamModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-darkcard border border-darkborder max-w-md w-full rounded-2xl p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-darkborder pb-3">
+                <h3 class="font-bold text-white text-base">Group 10 - AI Consulting Team</h3>
+                <button onclick="closeModal('teamModal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <div class="space-y-2 text-xs">
+                <div class="p-2.5 bg-slate-900 rounded-lg border border-slate-800 flex items-center justify-between">
+                    <div>
+                        <div class="font-bold text-white">PARTH NEMA</div>
+                        <div class="text-slate-400">Lead AI Strategist &amp; Prompt Engineer</div>
+                    </div>
+                    <span class="text-brand-400 bg-brand-500/10 px-2 py-0.5 rounded text-[10px]">Lead</span>
+                </div>
+                <div class="p-2.5 bg-slate-900 rounded-lg border border-slate-800 flex items-center justify-between">
+                    <div>
+                        <div class="font-bold text-white">ANSHU LODHI</div>
+                        <div class="text-slate-400">IBEF Industry &amp; Policy Analyst</div>
+                    </div>
+                </div>
+                <div class="p-2.5 bg-slate-900 rounded-lg border border-slate-800 flex items-center justify-between">
+                    <div>
+                        <div class="font-bold text-white">SIYA JAISWAL</div>
+                        <div class="text-slate-400">Stakeholder Research &amp; Interview Lead</div>
+                    </div>
+                </div>
+                <div class="p-2.5 bg-slate-900 rounded-lg border border-slate-800 flex items-center justify-between">
+                    <div>
+                        <div class="font-bold text-white">JANVI KAMRA</div>
+                        <div class="text-slate-400">Dashboard UI/UX Architect</div>
+                    </div>
+                </div>
+                <div class="p-2.5 bg-slate-900 rounded-lg border border-slate-800 flex items-center justify-between">
+                    <div>
+                        <div class="font-bold text-white">ANZILA HAYAT</div>
+                        <div class="text-slate-400">Impact Assessment &amp; Compliance Lead</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: SYSTEM ARCHITECTURE -->
+    <div id="archModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-darkcard border border-darkborder max-w-lg w-full rounded-2xl p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-darkborder pb-3">
+                <h3 class="font-bold text-white text-base">Phase II System Architecture</h3>
+                <button onclick="closeModal('archModal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <div class="space-y-3 text-xs text-slate-300">
+                <div class="p-3 bg-slate-900 rounded-lg border border-slate-800">
+                    <span class="font-bold text-brand-400 block mb-1">1. Intelligence Ingestion Layer</span>
+                    Automated scrapers pull IBEF quarterly PDFs, Ministry of Heavy Industries notifications, and EV OEM press releases into Pinecone VectorDB.
+                </div>
+                <div class="p-3 bg-slate-900 rounded-lg border border-slate-800">
+                    <span class="font-bold text-cyan-400 block mb-1">2. Generative RAG Engine</span>
+                    OpenAI GPT-4o fine-tuned prompts process vector context to answer policy queries without factual hallucinations.
+                </div>
+                <div class="p-3 bg-slate-900 rounded-lg border border-slate-800">
+                    <span class="font-bold text-amber-400 block mb-1">3. Orchestration &amp; Telematics</span>
+                    Make.com scenarios broadcast operational status updates directly to dealer portals and fleet driver apps.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast" class="fixed bottom-16 right-6 z-50 hidden bg-brand-500 text-slate-950 font-bold px-4 py-3 rounded-xl shadow-lg border border-brand-400 flex items-center space-x-2 text-xs">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toastMsg">Notification message here</span>
+    </div>
+
+    <!-- JAVASCRIPT CONTROLLERS -->
+    <script>
+        // Tab Switcher
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('bg-brand-500/20', 'text-brand-400', 'border', 'border-brand-500/30');
+                el.classList.add('text-slate-400');
+            });
+
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            const activeNav = document.getElementById('nav-' + tabId);
+            activeNav.classList.add('bg-brand-500/20', 'text-brand-400', 'border', 'border-brand-500/30');
+            activeNav.classList.remove('text-slate-400');
+
+            if (tabId === 'analytics') {
+                renderCharts();
+            }
+        }
+
+        // Modal Controls
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        // Toast Trigger
+        function triggerToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3500);
+        }
+
+        // AI Chat Simulator
+        function handleChatSubmit(e) {
+            e.preventDefault();
+            const input = document.getElementById('chatInput');
+            const val = input.value.trim();
+            if (!val) return;
+
+            appendUserMsg(val);
+            input.value = '';
+
+            setTimeout(() => {
+                appendAIMsg("Analyzing IBEF database for: '" + val + "'... The current policy framework guarantees GST at 5% for EVs and offers up to ₹15,000 subsidy per kWh for commercial battery packs.");
+            }, 800);
+        }
+
+        function sendQuickPrompt(promptText) {
+            appendUserMsg(promptText);
+            setTimeout(() => {
+                if (promptText.includes('PLI')) {
+                    appendAIMsg("PLI Auto Scheme: Allocation of ₹25,938 Cr incentivizes domestic EV component manufacturing with sales value incentives ranging from 8% to 13%.");
+                } else if (promptText.includes('GST')) {
+                    appendAIMsg("EV GST Rates: Electric Vehicles attract 5% GST (vs 28% for internal combustion engine vehicles). EV chargers attract 5% GST.");
+                } else {
+                    appendAIMsg("Executive Summary generated: FAME III allocates enhanced capital subsidies for charging infrastructure hubs across 40 major tier-1 and tier-2 cities.");
+                }
+            }, 700);
+        }
+
+        function appendUserMsg(txt) {
+            const log = document.getElementById('chatLog');
+            log.innerHTML += `
+                <div class="flex space-x-3 justify-end">
+                    <div class="bg-brand-500/20 text-brand-300 p-3 rounded-lg max-w-[85%] border border-brand-500/30">
+                        ${txt}
+                    </div>
+                </div>
+            `;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function appendAIMsg(txt) {
+            const log = document.getElementById('chatLog');
+            log.innerHTML += `
+                <div class="flex space-x-3">
+                    <div class="w-7 h-7 rounded bg-brand-500/20 text-brand-400 flex items-center justify-center flex-shrink-0 border border-brand-500/30">AI</div>
+                    <div class="bg-slate-800 text-slate-200 p-3 rounded-lg max-w-[85%] border border-slate-700">
+                        ${txt}
+                    </div>
+                </div>
+            `;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function clearChat() {
+            document.getElementById('chatLog').innerHTML = `
+                <div class="flex space-x-3">
+                    <div class="w-7 h-7 rounded bg-brand-500/20 text-brand-400 flex items-center justify-center flex-shrink-0 border border-brand-500/30">AI</div>
+                    <div class="bg-slate-800 text-slate-200 p-3 rounded-lg max-w-[85%] border border-slate-700">
+                        Chat log cleared. Ready for new EV industry compliance queries.
+                    </div>
+                </div>
+            `;
+        }
+
+        // Fleet Filter
+        function filterFleet(type) {
+            const cards = document.querySelectorAll('.fleet-card');
+            cards.forEach(card => {
+                if (type === 'all' || card.classList.contains(type)) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+
+        // Dealer Calc
+        function calculateSubsidy() {
+            const seg = parseInt(document.getElementById('calcSegment').value);
+            document.getElementById('subsidyAmt').innerText = '₹' + seg.toLocaleString('en-IN');
+            document.getElementById('calcResult').classList.remove('hidden');
+        }
+
+        function generateTemplate(type) {
+            if (type === 'warranty') {
+                triggerToast("Generated: 8-Year Battery Degradation Guarantee PDF shared to CRM.");
+            } else {
+                triggerToast("Generated: Home Fast-Charger Site Readiness Form copied.");
+            }
+        }
+
+        function downloadReport() {
+            triggerToast("Downloading Phase II EV Communication Executive Report (PDF)...");
+        }
+
+        // Chart.js Rendering
+        let chartsRendered = false;
+        function renderCharts() {
+            if (chartsRendered) return;
+            chartsRendered = true;
+
+            const ctx1 = document.getElementById('chartSales').getContext('2d');
+            new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: ['2020', '2022', '2024', '2026E', '2028E', '2030E'],
+                    datasets: [{
+                        label: 'Electric 2W/3W',
+                        data: [120, 450, 1100, 1820, 3200, 6500],
+                        borderColor: '#22c55e',
+                        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }, {
+                        label: 'Passenger 4W',
+                        data: [15, 60, 180, 420, 950, 2100],
+                        borderColor: '#06b6d4',
+                        backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#94a3b8', font: { size: 10 } } } },
+                    scales: {
+                        x: { ticks: { color: '#64748b' }, grid: { color: '#1f2937' } },
+                        y: { ticks: { color: '#64748b' }, grid: { color: '#1f2937' } }
+                    }
+                }
+            });
+
+            const ctx2 = document.getElementById('chartSentiment').getContext('2d');
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Positive (Range Clarity)', 'Neutral (Awaiting Subsidy)', 'Concern (Infra Density)'],
+                    datasets: [{
+                        data: [58, 27, 15],
+                        backgroundColor: ['#22c55e', '#3b82f6', '#f59e0b'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 } } } }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
